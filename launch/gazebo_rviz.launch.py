@@ -9,8 +9,29 @@ from launch.substitutions import (
 )
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+from ament_index_python.packages import get_package_share_directory
+import os
 
 def generate_launch_description():
+    
+    pkg_share = get_package_share_directory('smb_gazebo')
+    
+    rviz_config_file = os.path.join(
+        pkg_share,
+        'rviz',
+        'smb_tf.rviz'
+    )
+    
+    use_rviz = LaunchConfiguration('use_rviz')
+    
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        arguments=['-d', rviz_config_file],
+        output='screen',
+        condition=IfCondition(use_rviz)
+    )
     
     world_file_path = PathJoinSubstitution([
         FindPackageShare("smb_gazebo"),
@@ -33,6 +54,11 @@ def generate_launch_description():
         DeclareLaunchArgument("debug", default_value="false"),
         DeclareLaunchArgument("verbose", default_value="false"),
         DeclareLaunchArgument("run_gui", default_value="true"),
+        DeclareLaunchArgument(
+            'use_rviz',
+            default_value='true',
+            description='Launch RViz2'
+        ),
     ]
 
     load_launch = IncludeLaunchDescription(
@@ -97,5 +123,6 @@ def generate_launch_description():
             gz_sim,
             spawn_robot,
             ros_gz_bridge,
+            rviz_node,
         ]
     )

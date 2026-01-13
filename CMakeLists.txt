@@ -18,6 +18,6 @@ ament_package()
 
 # Install launch/config/world files
 install(
-  DIRECTORY launch config worlds
+  DIRECTORY launch config worlds rviz
   DESTINATION share/${PROJECT_NAME}
 )
